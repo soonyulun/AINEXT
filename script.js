@@ -173,7 +173,7 @@ function simpleLinearPrediction(prices, days = 10) {
 
     return {
         price: prediction,
-        changePercent: ((prediction - y[y.length - 1]) / y[y.length - 1] * 100)  // Fixed: Added missing )
+        changePercent: ((prediction - y[y.length - 1]) / y[y.length - 1] * 100))  // Fixed: Added missing )
     };
 }
 
