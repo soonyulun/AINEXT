@@ -1,56 +1,70 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Stock Technical Analysis</title>
-    <link rel="stylesheet" href="styles.css">
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <title>Stock Analysis Tool</title>
+    <link rel="stylesheet" href="/static/style.css">
 </head>
 <body>
     <div class="container">
-        <h1>Stock Technical Analysis</h1>
+        <h1>Stock Analysis Tool</h1>
+        <form method="POST">
+            <input type="text" name="ticker" placeholder="Enter ticker (e.g. AAPL)" value="{{ ticker if ticker else 'BABA' }}" required>
+            <button type="submit">Analyze</button>
+        </form>
 
-        <div class="input-group">
-            <input type="text" id="tickerInput" placeholder="Enter ticker (e.g. AAPL)" value="BABA">
-            <button id="analyzeBtn">Analyze</button>
+        {% if analysis_complete %}
+        <div class="results">
+            <h2>Analysis for {{ ticker }}</h2>
+            
+            <div class="indicators">
+                <div class="indicator">
+                    <h3>Price Information</h3>
+                    <p>Current Price: ${{ "%.2f"|format(latest_close) }}</p>
+                    <p>Predicted Price (20 days): ${{ "%.2f"|format(predicted_price) }} ({{ "%.1f"|format(price_change) }}%)</p>
+                    <p>Model R² Score: {{ "%.4f"|format(r2_score) }}</p>
+                </div>
+                
+                <div class="indicator">
+                    <h3>Technical Indicators</h3>
+                    <p>RSI: {{ "%.1f"|format(current_rsi) }}</p>
+                    <p>MACD: {{ "%.2f"|format(current_macd) }} ({{ 'Bullish' if current_macd > current_signal else 'Bearish' }})</p>
+                    <p>Trend: {{ 'Bullish' if latest_close > ema_50 > sma_200 else 'Bearish' }}</p>
+                    <p>50EMA: ${{ "%.2f"|format(ema_50) }}</p>
+                    <p>200SMA: ${{ "%.2f"|format(sma_200) }}</p>
+                </div>
+                
+                <div class="indicator">
+                    <h3>Trading Recommendation</h3>
+                    {% if r2_score > 0.4 %}
+                        {% if price_change > 5 %}
+                            <p class="buy">🟢 STRONG BUY: Expected price increase of {{ "%.1f"|format(price_change) }}% in 20 days</p>
+                        {% elif price_change > 2 %}
+                            <p class="buy">🟢 BUY: Expected price increase of {{ "%.1f"|format(price_change) }}% in 20 days</p>
+                        {% elif price_change < -5 %}
+                            <p class="sell">🔴 STRONG SELL: Expected price decrease of {{ "%.1f"|format(-price_change) }}% in 20 days</p>
+                        {% elif price_change < -2 %}
+                            <p class="sell">🔴 SELL: Expected price decrease of {{ "%.1f"|format(-price_change) }}% in 20 days</p>
+                        {% else %}
+                            <p class="hold">🟡 HOLD: Expected price movement within ±2% in 20 days</p>
+                        {% endif %}
+                    {% else %}
+                        <p class="hold">⚠️ Low model confidence - using standard technical analysis</p>
+                        {% if latest_close > ema_50 > sma_200 %}
+                            <p class="buy">🟢 BUY: Price above both 50EMA and 200SMA</p>
+                        {% elif latest_close < ema_50 %}
+                            <p class="sell">🔴 SELL: Price below 50EMA</p>
+                        {% else %}
+                            <p class="hold">🟡 HOLD: Mixed signals or ranging market</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="chart">
+                <img src="{{ plot_url }}" alt="Stock Analysis Chart">
+            </div>
         </div>
-
-        <div id="loading" class="hidden">Loading data...</div>
-
-        <div id="results" class="hidden">
-            <div class="summary-card">
-                <h2 id="stockTitle"></h2>
-                <div class="price-info">
-                    <span id="currentPrice"></span>
-                    <span id="prediction"></span>
-                </div>
-                <div class="indicators">
-                    <div><span>RSI(14):</span> <span id="rsiValue"></span></div>
-                    <div><span>MACD:</span> <span id="macdValue"></span></div>
-                    <div><span>Trend:</span> <span id="trendValue"></span></div>
-                </div>
-                <div class="recommendation">
-                    <h3>Recommendation:</h3>
-                    <p id="recommendationText"></p>
-                </div>
-            </div>
-
-            <div class="chart-container">
-                <canvas id="priceChart"></canvas>
-            </div>
-
-            <div class="chart-container">
-                <canvas id="rsiChart"></canvas>
-            </div>
-
-            <div class="chart-container">
-                <canvas id="macdChart"></canvas>
-            </div>
-        </div>
+        {% endif %}
     </div>
-
-    <script src="script.js"></script>
 </body>
 </html>
