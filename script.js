@@ -36,39 +36,12 @@ async function analyzeStock() {
     }
 }
 
+// Financial Modeling Prep (free tier)
 async function fetchStockData(ticker) {
-    try {
-        // Using Yahoo Finance API via RapidAPI (you'll need an API key)
-        const response = await axios.get(
-            `https://yahoo-finance15.p.rapidapi.com/api/yahoo/hi/history/${ticker}/1d`,
-            {
-                headers: {
-                    'X-RapidAPI-Key': 'your-api-key',
-                    'X-RapidAPI-Host': 'yahoo-finance15.p.rapidapi.com'
-                },
-                params: {
-                    diffandsplits: 'false'
-                }
-            }
-        );
-
-        // Alternative free API if Yahoo doesn't work:
-        // const response = await axios.get(`https://financialmodelingprep.com/api/v3/historical-price-full/${ticker}?apikey=YOUR_API_KEY`);
-
-        const data = response.data;
-        const dates = data.items.map(item => new Date(item.date * 1000));
-        const closes = data.items.map(item => item.close);
-
-        return {
-            dates: dates,
-            close: closes,
-            high: data.items.map(item => item.high),
-            low: data.items.map(item => item.low),
-            volume: data.items.map(item => item.volume)
-        };
-    } catch (error) {
-        throw new Error('Failed to fetch stock data');
-    }
+    const response = await fetch(
+        `https://financialmodelingprep.com/api/v3/quote-short/${ticker}?apikey=demo`
+    );
+    return await response.json();
 }
 
 function calculateIndicators(data) {
