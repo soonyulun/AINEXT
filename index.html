@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Stock Technical Analysis</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <h1>Stock Technical Analysis</h1>
+
+        <div class="input-group">
+            <input type="text" id="tickerInput" placeholder="Enter ticker (e.g. AAPL)" value="BABA">
+            <button id="analyzeBtn">Analyze</button>
+        </div>
+
+        <div id="loading" class="hidden">Loading data...</div>
+
+        <div id="results" class="hidden">
+            <div class="summary-card">
+                <h2 id="stockTitle"></h2>
+                <div class="price-info">
+                    <span id="currentPrice"></span>
+                    <span id="prediction"></span>
+                </div>
+                <div class="indicators">
+                    <div><span>RSI(14):</span> <span id="rsiValue"></span></div>
+                    <div><span>MACD:</span> <span id="macdValue"></span></div>
+                    <div><span>Trend:</span> <span id="trendValue"></span></div>
+                </div>
+                <div class="recommendation">
+                    <h3>Recommendation:</h3>
+                    <p id="recommendationText"></p>
+                </div>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="priceChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="rsiChart"></canvas>
+            </div>
+
+            <div class="chart-container">
+                <canvas id="macdChart"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
